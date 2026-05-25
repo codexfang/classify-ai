@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
 import { AnalyticsDashboard } from './components/AnalyticsDashboard'
-import { Footer } from './components/Footer'
 import { Header } from './components/Header'
 import { InputPanel } from './components/InputPanel'
 import { ResultsTable } from './components/ResultsTable'
@@ -76,10 +75,10 @@ export default function App() {
   const handleExport = () => exportResultsToCsv(results)
 
   return (
-    <div className="flex min-h-screen flex-col bg-gradient-to-b from-slate-100 via-slate-50 to-indigo-50/40">
+    <div className="min-h-screen bg-gradient-to-b from-slate-100 via-slate-50 to-indigo-50/40">
       <Header />
 
-      <main className="mx-auto max-w-6xl space-y-6 px-4 py-8 sm:px-6 sm:py-10">
+      <main className="mx-auto w-full max-w-[1400px] space-y-6 px-5 py-8 sm:px-8 sm:py-10">
         <InputPanel
           value={input}
           onChange={setInput}
@@ -96,8 +95,6 @@ export default function App() {
 
         <AnalyticsDashboard summary={summary} visible={showResults} />
       </main>
-
-      <Footer />
     </div>
   )
 }

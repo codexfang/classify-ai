@@ -22,7 +22,7 @@ function ConfidenceBar({ value }: { value: number }) {
 
   return (
     <div className="flex items-center gap-2">
-      <div className="h-1.5 w-16 overflow-hidden rounded-full bg-slate-100 sm:w-20">
+      <div className="h-1.5 w-20 overflow-hidden rounded-full bg-slate-100 lg:w-28">
         <div
           className={`h-full rounded-full ${color} transition-all duration-500`}
           style={{ width: `${value}%` }}
@@ -66,7 +66,7 @@ export function ResultsTable({ results, onExport, visible }: ResultsTableProps) 
       </div>
 
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[640px] text-left text-sm">
+        <table className="w-full text-left text-sm">
           <thead>
             <tr className="border-b border-slate-100 bg-slate-50/80 text-xs font-semibold uppercase tracking-wider text-slate-500">
               <th className="px-5 py-3 sm:px-6">Transaction</th>
