@@ -40,6 +40,27 @@ export function InputPanel({
         spellCheck={false}
       />
 
+      {isAnalyzing && (
+        <div
+          className="mt-3 overflow-hidden rounded-xl border border-indigo-200/80 bg-indigo-50/90"
+          role="status"
+          aria-live="polite"
+        >
+          <div className="flex items-center gap-3 px-4 py-3">
+            <span className="h-4 w-4 shrink-0 animate-spin rounded-full border-2 border-indigo-300 border-t-indigo-600" />
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-medium text-indigo-900">Analyzing your transactions…</p>
+              <p className="mt-0.5 text-xs text-indigo-600/90">
+                Matching categories and preparing results
+              </p>
+            </div>
+          </div>
+          <div className="h-1 w-full overflow-hidden bg-indigo-100">
+            <div className="h-full w-1/3 animate-pulse rounded-full bg-gradient-to-r from-indigo-500 to-violet-500" />
+          </div>
+        </div>
+      )}
+
       <div className="mt-4 flex flex-wrap gap-3">
         <button
           type="button"
