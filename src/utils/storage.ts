@@ -5,6 +5,8 @@ const STORAGE_KEY = 'classify-ai-state'
 export interface PersistedState {
   input: string
   results: ClassificationResult[]
+  analysisCount: number
+  lastAnalyzedAt: string | null
 }
 
 export function loadState(): PersistedState | null {
@@ -15,7 +17,12 @@ export function loadState(): PersistedState | null {
     if (typeof parsed.input !== 'string' || !Array.isArray(parsed.results)) {
       return null
     }
-    return parsed
+    return {
+      input: parsed.input,
+      results: parsed.results,
+      analysisCount: parsed.analysisCount ?? 0,
+      lastAnalyzedAt: parsed.lastAnalyzedAt ?? null,
+    }
   } catch {
     return null
   }

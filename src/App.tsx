@@ -7,7 +7,7 @@ import type { AnalyticsSummary, ClassificationResult } from './types'
 import { buildAnalytics, classifyTransactions } from './utils/classification'
 import { exportResultsToCsv } from './utils/exportCsv'
 import { SAMPLE_TRANSACTIONS } from './utils/keywords'
-import { loadState, saveState } from './utils/storage'
+import { clearState, loadState, saveState } from './utils/storage'
 
 const EMPTY_SUMMARY: AnalyticsSummary = {
   totalTransactions: 0,
@@ -30,6 +30,8 @@ export default function App() {
   const [summary, setSummary] = useState<AnalyticsSummary>(EMPTY_SUMMARY)
   const [showResults, setShowResults] = useState(false)
   const [isAnalyzing, setIsAnalyzing] = useState(false)
+  const [analysisCount, setAnalysisCount] = useState(0)
+  const [lastAnalyzedAt, setLastAnalyzedAt] = useState<string | null>(null)
 
   useEffect(() => {
     const saved = loadState()
@@ -38,14 +40,16 @@ export default function App() {
       setResults(saved.results)
       setSummary(buildAnalytics(saved.results))
       setShowResults(saved.results.length > 0)
+      setAnalysisCount(saved.analysisCount)
+      setLastAnalyzedAt(saved.lastAnalyzedAt)
     }
   }, [])
 
   useEffect(() => {
     if (input || results.length > 0) {
-      saveState({ input, results })
+      saveState({ input, results, analysisCount, lastAnalyzedAt })
     }
-  }, [input, results])
+  }, [input, results, analysisCount, lastAnalyzedAt])
 
   const runAnalysis = useCallback((text: string) => {
     setIsAnalyzing(true)
@@ -55,6 +59,8 @@ export default function App() {
       const classified = classifyTransactions(text)
       setResults(classified)
       setSummary(buildAnalytics(classified))
+      setAnalysisCount((prev) => prev + 1)
+      setLastAnalyzedAt(new Date().toISOString())
       setShowResults(true)
       setIsAnalyzing(false)
     }, 400)
@@ -73,6 +79,16 @@ export default function App() {
   }
 
   const handleExport = () => exportResultsToCsv(results)
+
+  const handleClearHistory = () => {
+    clearState()
+    setInput('')
+    setResults([])
+    setSummary(EMPTY_SUMMARY)
+    setShowResults(false)
+    setAnalysisCount(0)
+    setLastAnalyzedAt(null)
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-100 via-slate-50 to-indigo-50/40">
@@ -93,7 +109,13 @@ export default function App() {
           visible={showResults}
         />
 
-        <AnalyticsDashboard summary={summary} visible={showResults} />
+        <AnalyticsDashboard
+          summary={summary}
+          visible={showResults}
+          analysisCount={analysisCount}
+          lastAnalyzedAt={lastAnalyzedAt}
+          onClearHistory={handleClearHistory}
+        />
       </main>
     </div>
   )

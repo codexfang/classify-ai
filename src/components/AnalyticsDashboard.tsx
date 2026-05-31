@@ -13,19 +13,23 @@ ChartJS.register(ArcElement, Tooltip, Legend)
 interface AnalyticsDashboardProps {
   summary: AnalyticsSummary
   visible: boolean
+  analysisCount: number
+  lastAnalyzedAt: string | null
+  onClearHistory: () => void
 }
 
 interface SummaryCardProps {
   label: string
   value: string
   sub?: string
-  accent: 'indigo' | 'violet' | 'blue'
+  accent: 'indigo' | 'violet' | 'blue' | 'amber'
 }
 
 const ACCENT_STYLES = {
   indigo: 'from-indigo-500/10 to-indigo-600/5 border-indigo-200/60 text-indigo-700',
   violet: 'from-violet-500/10 to-violet-600/5 border-violet-200/60 text-violet-700',
   blue: 'from-blue-500/10 to-blue-600/5 border-blue-200/60 text-blue-700',
+  amber: 'from-amber-500/10 to-amber-600/5 border-amber-200/60 text-amber-700',
 }
 
 function SummaryCard({ label, value, sub, accent }: SummaryCardProps) {
@@ -40,7 +44,7 @@ function SummaryCard({ label, value, sub, accent }: SummaryCardProps) {
   )
 }
 
-export function AnalyticsDashboard({ summary, visible }: AnalyticsDashboardProps) {
+export function AnalyticsDashboard({ summary, visible, analysisCount, lastAnalyzedAt, onClearHistory }: AnalyticsDashboardProps) {
   if (!visible || summary.totalTransactions === 0) return null
 
   const labels = EXPENSE_CATEGORIES.filter((c) => summary.categoryCounts[c] > 0)
@@ -90,13 +94,26 @@ export function AnalyticsDashboard({ summary, visible }: AnalyticsDashboardProps
     ? `'${summary.mostFrequentKeyword}'`
     : '—'
 
+  const lastAnalyzedLabel = lastAnalyzedAt
+    ? (() => {
+        const diff = Date.now() - new Date(lastAnalyzedAt).getTime()
+        const mins = Math.floor(diff / 60000)
+        if (mins < 1) return 'Just now'
+        if (mins < 60) return `${mins} minute${mins !== 1 ? 's' : ''} ago`
+        const hours = Math.floor(mins / 60)
+        if (hours < 24) return `${hours} hour${hours !== 1 ? 's' : ''} ago`
+        const days = Math.floor(hours / 24)
+        return `${days} day${days !== 1 ? 's' : ''} ago`
+      })()
+    : '—'
+
   return (
     <section className="animate-fade-in space-y-6">
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-4">
         <SummaryCard
           label="Total Transactions"
           value={String(summary.totalTransactions)}
-          sub="Analyzed in this session"
+          sub="In current batch"
           accent="indigo"
         />
         <SummaryCard
@@ -114,6 +131,12 @@ export function AnalyticsDashboard({ summary, visible }: AnalyticsDashboardProps
           value={keywordLabel}
           sub="Across matched transactions"
           accent="blue"
+        />
+        <SummaryCard
+          label="Session Stats"
+          value={`${analysisCount}`}
+          sub={lastAnalyzedLabel !== '—' ? `Last analyzed ${lastAnalyzedLabel}` : undefined}
+          accent="amber"
         />
       </div>
 
@@ -148,6 +171,16 @@ export function AnalyticsDashboard({ summary, visible }: AnalyticsDashboardProps
             )
           })}
         </div>
+      </div>
+
+      <div className="flex justify-end">
+        <button
+          type="button"
+          onClick={onClearHistory}
+          className="rounded-lg border border-slate-200 px-4 py-2 text-xs font-medium text-slate-500 transition hover:border-red-200 hover:bg-red-50 hover:text-red-700"
+        >
+          Clear History
+        </button>
       </div>
     </section>
   )
